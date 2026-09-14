@@ -80,6 +80,10 @@ bot.command("cancel", async (ctx) => {
   await ctx.reply("Заказ отменён. Если захотите продолжить — нажмите /start");
 });
 
+bot.command("myid", async (ctx) => {
+  await ctx.reply(`Ваш Telegram ID: ${ctx.from.id}`);
+});
+
 bot.callbackQuery(/^pkg:/, async (ctx) => {
   const id = ctx.callbackQuery.data.slice(4);
   const pkg = getPackage(id);
