@@ -207,7 +207,7 @@ async function main() {
   process.once("SIGINT", () => stop("SIGINT"));
 
   await bot.start({
-    drop_pending_updates: true,
+    drop_pending_updates: false,
     onStart: (me) => console.log(`Бот запущен: @${me.username}`),
   });
 }

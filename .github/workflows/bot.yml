@@ -1,0 +1,35 @@
+name: freefire-bot
+
+on:
+  schedule:
+    # Каждый час в :05 бот встаёт в онлайн и работает до :55.
+    # В паузе (10 минут) сообщения копятся у Telegram и обрабатываются при старте.
+    - cron: "5 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: freefire-bot
+  cancel-in-progress: false
+
+jobs:
+  bot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    env:
+      BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+      BOT_OWNER_ID: ${{ secrets.BOT_OWNER_ID }}
+      PAYMENT_CARD: ${{ secrets.PAYMENT_CARD }}
+      CARD_HOLDER: ${{ secrets.CARD_HOLDER }}
+      ADMIN_COMMENT: ${{ secrets.ADMIN_COMMENT }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm ci
+
+      - name: Запуск бота (до 50 минут)
+        run: node src/bot.js
+        timeout-minutes: 49
