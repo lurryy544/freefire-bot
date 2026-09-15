@@ -139,6 +139,25 @@ async function notifyAdmins(ctx, pkg, ffId) {
   }
 }
 
+bot.on("message:text", async (ctx) => {
+  const state = db.getState(ctx.from.id);
+  if (!state || state.step !== "awaiting_id") return;
+
+  const ffId = ctx.message.text.trim();
+  const pkg = getPackage(state.pkgId);
+  if (!pkg) {
+    await ctx.reply("Пакет не найден. Нажмите /start и выберите пакет заново.");
+    return;
+  }
+  if (!/^\d+$/.test(ffId) || ffId.length < 4) {
+    await ctx.reply("Игровой ID состоит из цифр (от 4 символов). Введите его ещё раз:");
+    return;
+  }
+
+  db.setState(ctx.from.id, { ...state, step: "awaiting_payment", ffId });
+  await sendPaymentDetails(ctx, pkg, ffId);
+});
+
 bot.on("message:photo", async (ctx) => {
   const state = db.getState(ctx.from.id);
   if (!state || state.step !== "awaiting_photo") {
